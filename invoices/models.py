@@ -8,3 +8,19 @@ class Invoice(models.Model):
     verified = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
     validity = models.DateField()
+
+    contract = models.ForeignKey(
+        "contracts.Contract",
+        on_delete=models.CASCADE,
+        related_name="invoices",
+    )
+
+    employee = models.ForeignKey(
+        "employees.Employee",
+        on_delete=models.CASCADE,
+        related_name="invoices",
+    )
+
+    def __repr__(self) -> str:
+        return f"<[{self.id}] - {self.invoice_number}, {self.description}, {self.validity}, {self.description}>"
+    

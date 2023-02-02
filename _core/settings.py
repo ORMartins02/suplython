@@ -47,7 +47,10 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-THIRD_PARTY_APPS = ["rest_framework", "drf_spectacular"]
+THIRD_PARTY_APPS = [
+    "rest_framework",
+    "drf_spectacular",
+]
 
 MY_APPS = [
     "employees",
@@ -96,15 +99,15 @@ WSGI_APPLICATION = "_core.wsgi.application"
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    # "default": {
-    #     "ENGINE": "django.db.backends.postgresql",
-    #     "NAME": os.getenv("POSTGRES_DB"),
-    #     "USER": os.getenv("POSTGRES_USER"),
-    #     "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
-    #     "HOST": "supplython_db",
-    #     "PORT": "5432",
-    # },
     "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("POSTGRES_DB"),
+        "USER": os.getenv("POSTGRES_USER"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+        "HOST": "supplython_db",
+        "PORT": "5432",
+    },
+    "dbsqlite3": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     },
@@ -117,9 +120,9 @@ if DATABASE_URL:
         default=DATABASE_URL, conn_max_age=500, ssl_require=True
     )
     DATABASES["default"].update(db_from_env)
-    DEBUG = False
+    DEBUG = True
 
-if not DEBUG:
+if DEBUG:
     # Tell Django to copy statics to the `staticfiles` directory
     # in your application directory on Render.
     STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
@@ -177,11 +180,18 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_USE_TLS = True
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+
 AUTH_USER_MODEL = "employees.Employee"
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Supplython",
-    "DESCRIPTION": "API Supplython description",
+    "DESCRIPTION": "API Supplython: This application is a cost management system for small companies, based on the needs of the Supply Chain area. It has CRUD of employees, suppliers, invoices, departments, categories and contracts.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
