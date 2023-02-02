@@ -9,12 +9,7 @@ from .serializers import InvoiceSerializer, DetailedInvoiceSerializer
 from employees.permissions import IsManager
 from contracts.models import Contract
 from employees.models import Employee
-from suppliers.models import Supplier
-from rest_framework import generics
-from rest_framework.exceptions import ValidationError
-from .models import Invoice
-from django.core.mail import send_mail
-from django.conf import settings
+from utils.factory_pdf import factory_pdf
 
 
 @extend_schema_view(
@@ -47,26 +42,18 @@ class InvoiceView(generics.ListCreateAPIView):
         )
 
         if len(invoices_verify) > 0:
-            if invoices_verify[0].supplier_id == self.request.data["supplier_id"]:
+            if invoices_verify[0].contract_id == self.request.data["contract_id"]:
                 raise ValidationError(
                     {"details": "This note has already been released."}
                 )
 
         contract = get_object_or_404(Contract, id=self.request.data["contract_id"])
-        supplier = get_object_or_404(Supplier, id=self.request.data["supplier_id"])
         employee = get_object_or_404(Employee, id=self.request.data["employee_id"])
 
-        send_mail(
-            subject="New Invoice Created",
-            message="Um novo invoice foi gerado no nome da sua empresa, verifique os dados que foram preenchidos!",
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[supplier.email],
-            fail_silently=False,
-        )
+        factory_pdf(self.request.data, contract, employee)
 
         return serializer.save(
             contract=contract,
-            supplier=supplier,
             employee=employee,
         )
 

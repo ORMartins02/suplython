@@ -1,21 +1,28 @@
 from rest_framework import serializers
 from .models import Category
-from suppliers.serializers import SupplierSerializer
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    supplier = SupplierSerializer(read_only=True, many=True)
+    class Meta:
+        model = Category
+        fields = ["id", "name"]
+        read_only_fields = ["id"]
+
+
+class DetailCategorySerializer(serializers.ModelSerializer):
+    supplier_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Category
-        fields = ["id", "name", "supplier"]
+        fields = ["id", "name", "supplier_id"]
         read_only_fields = ["id"]
 
-    def create(self, validated_data):
-        supplier_list = validated_data.pop("supplier")
+    def update(self, instance: Category, validated_data: dict) -> Category:
+        supplier = validated_data.pop("supplier_id")
 
-        category = Category.objects.create(**validated_data)
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
 
-        category.supplier.add(supplier_list)
+        instance.supplier.add(supplier)
 
-        return category
+        return instance
