@@ -1,10 +1,33 @@
 from rest_framework.test import APITestCase
-from employees.models import Employee
+from employees.models import Employeefeat/employee-drf-test
+from employees.serializers import EmployeeSerializer
+import ipdb
+
+client = APIClient()
+
+response_post = client.post(
+    "/api/employees/",
+    {
+        "name": "Manager",
+        "username": "manager10",
+        "email": "manager10@mail.com",
+        "password": "1234",
+        "is_manager": True,
+    },
+    format="json",
+)
+
+response_get = client.get("/api/employees/")
+
+response_get = client.get("/api/employees/1/")
+
+response_get = client.patch("/api/employees/1/", {"name": "Manager Juninho"})
 
 
 class EmployeesViewsTest(APITestCase):
     @classmethod
-    def setUpTestData(cls):
+ feat/employee-drf-test
+    def setUpTestData(cls) -> None:
 
         cls.employeeNotAdmin = {
             "name": "Cleitu",
@@ -25,10 +48,21 @@ class EmployeesViewsTest(APITestCase):
             for employee_id in range(1, 2)
         ]
 
+ feat/employee-drf-test
+        cls.manager = [
+            Employee.objects.create_user(
+                name=f"John",
+                username=f"Johnas",
+                email=f"john@mail.com ",
+                password="1234",
+                is_superuser=True,
+            )
+        ]
+
     def test_create_common_user(self):
         url = "/api/employees/"
 
-        response = self.client.post(url, self.employeeNotAdmin)
+        response = self.client.post(url, self.employeeNotAdmin, format="json")
         expected_status_code = 201
         message = "verify if status code 201 is returning"
 
