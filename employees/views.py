@@ -24,6 +24,7 @@ class EmployeeView(generics.ListCreateAPIView):
 
     queryset = Employee.objects.all()
 
+feat/employee
     def get_serializer_class(self):
         if self.request.method == "GET":
             return DetailEmployeeSerializer
@@ -44,6 +45,7 @@ class EmployeeView(generics.ListCreateAPIView):
     ),
     put=extend_schema(exclude=True),
 )
+
 class EmployeeDetailView(generics.RetrieveUpdateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsManager]
